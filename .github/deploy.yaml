@@ -2,36 +2,37 @@ name: Deploy to Minikube
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: self-hosted
 
     steps:
-    - name: Check Repo
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Configure Minikube Docker Environment
-      run: |
-        minikube docker-env --shell powershell | Invoke-Expression
+      - name: Configure Minikube Docker
+        run: |
+          minikube docker-env --shell powershell | Invoke-Expression
 
-    - name: Build Backend Docker Image
-      run: |
-        cd backend
-        docker build -t backend-app:latest .
+      - name: Build Backend Docker Image
+        run: |
+          cd backend
+          docker build -t backend-app:latest .
 
-    - name: Build Frontend Docker Image
-      run: |
-        cd dashboard
-        docker build -t frontend-app:latest .
+      - name: Build Frontend Docker Image
+        run: |
+          cd dashboard
+          docker build -t frontend-app:latest .
 
-    - name: Apply Kubernetes Files
-      run: |
-        kubectl apply -f k8s/backend-deployment.yaml
-        kubectl apply -f k8s/backend-service.yaml
-        kubectl apply -f k8s/frontend-deployment.yaml
-        kubectl apply -f k8s/frontend-service.yaml
+      - name: Apply Kubernetes Files
+        run: |
+          kubectl apply -f k8s/backend-deployment.yaml
+          kubectl apply -f k8s/backend-service.yaml
+          kubectl apply -f k8s/frontend-deployment.yaml
+          kubectl apply -f k8s/frontend-service.yaml
 
-    - name: Verify Deployment
-      run: kubectl get pods
+      - name: Verify Pods
+        run: kubectl get pods
